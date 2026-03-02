@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Predictions</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Analysis History</h1>
+            <p>View all past anomaly detections</p>
+        </header>
+
+        <nav>
+            <a href="{% url 'theft_detection:index' %}">Dashboard</a>
+            <a href="{% url 'theft_detection:predictions_list' %}">History</a>
+            <a href="{% url 'theft_detection:predict_page' %}">Run Analysis</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+
+        <div class="filters">
+            <label>Filter by Status:</label>
+            <select onchange="location = '?theft=' + this.value;">
+                <option value="">All Predictions</option>
+                <option value="theft" {% if theft_filter == "theft" %}selected{% endif %}>Theft Only</option>
+                <option value="normal" {% if theft_filter == "normal" %}selected{% endif %}>Normal Only</option>
+            </select>
+        </div>
+
+        {% if predictions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Meter ID</th>
+                    <th>Daily Consumption</th>
+                    <th>Voting Prediction</th>
+                    <th>Confidence</th>
+                    <th>LOF Prediction</th>
+                    <th>LOF Score</th>
+                    <th>IF Prediction</th>
+                    <th>IF Score</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in predictions %}
+                <tr>
+                    <td><strong>{{ pred.electricity_data.meter_id }}</strong></td>
+                    <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
+                    <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
+                    <td><span class="score">{{ pred.confidence|floatformat:3 }}</span></td>
+                    <td>{{ pred.lof_prediction|upper }}</td>
+                    <td><span class="score">{{ pred.lof_score|floatformat:4 }}</span></td>
+                    <td>{{ pred.if_prediction|upper }}</td>
+                    <td><span class="score">{{ pred.if_score|floatformat:4 }}</span></td>
+                    <td>{{ pred.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>No predictions found. Generate data first!</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

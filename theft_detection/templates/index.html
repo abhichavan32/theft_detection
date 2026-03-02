@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Theft Detection</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Intelligence Dashboard</h1>
+            <p>Electricity anomaly tracking & theft detection</p>
+        </header>
+        
+        <nav>
+            <a href="{% url 'theft_detection:index' %}">Dashboard</a>
+            <a href="{% url 'theft_detection:predictions_list' %}">History</a>
+            <a href="{% url 'theft_detection:predict_page' %}">Run Analysis</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+        
+        {% if error %}
+        <div class="error">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <h3>Total Records</h3>
+                <div class="value">{{ total_records }}</div>
+            </div>
+            <div class="stat-card theft">
+                <h3>Theft Detected</h3>
+                <div class="value">{{ theft_records }}</div>
+            </div>
+            <div class="stat-card normal">
+                <h3>Normal Usage</h3>
+                <div class="value">{{ normal_records }}</div>
+            </div>
+        </div>
+        
+        {% if recent_predictions %}
+        <div class="recent-section">
+            <h2>Recent Predictions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Meter ID</th>
+                        <th>Daily Consumption (kWh)</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                        <th>LOF</th>
+                        <th>Isolation Forest</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in recent_predictions %}
+                    <tr>
+                        <td><strong>{{ pred.electricity_data.meter_id }}</strong></td>
+                        <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }}</td>
+                        <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
+                        <td><span class="confidence">{{ pred.confidence|floatformat:2 }}</span></td>
+                        <td>{{ pred.lof_prediction|upper }}</td>
+                        <td>{{ pred.if_prediction|upper }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <footer>
+            <p>&copy; 2026 Electricity Theft Detection System | Advanced ML-based Detection</p>
+        </footer>
+    </div>
+</body>
+</html>
