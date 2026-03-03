@@ -15,11 +15,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-electricity-theft-detectio
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# Parse ALLOWED_HOSTS from environment, always allow localhost
-allowed_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-# Always allow Vercel domains
-allowed_hosts.extend(['.vercel.app', 'localhost', '127.0.0.1'])
-ALLOWED_HOSTS = list(set(allowed_hosts))  # Remove duplicates
+# For Vercel deployment - allow all hosts
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
