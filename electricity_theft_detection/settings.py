@@ -9,6 +9,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-electricity-theft-detection-key-change-in-production')
@@ -25,17 +30,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'theft_detection',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
-# Add WhiteNoise only in production (Vercel)
+# Add WhiteNoise only in production (Render/Vercel) and if available
 if not DEBUG:
-    MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+    try:
+        import whitenoise
+        MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+    except ImportError:
+        pass
 
 MIDDLEWARE.extend([
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,9 +80,8 @@ WSGI_APPLICATION = 'electricity_theft_detection.wsgi.application'
 # Database configuration from .env or DATABASE_URL (Render)
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-if DATABASE_URL:
+if DATABASE_URL and dj_database_url:
     # Use DATABASE_URL from Render PostgreSQL
-    import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
@@ -80,7 +90,7 @@ if DATABASE_URL:
         )
     }
 else:
-    # Use individual database settings
+    # Use individual database settings (default for SQLite)
     DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
     DB_NAME = os.getenv('DB_NAME', 'db.sqlite3')
     
@@ -119,9 +129,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'theft_detection', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise configuration - only in production
+# WhiteNoise configuration - only in production if available
 if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    try:
+        import whitenoise
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    except ImportError:
+        pass
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -162,4 +176,25 @@ LOGGING = {
         'handlers': ['console', 'file'],
         'level': os.getenv('LOG_LEVEL', 'INFO'),
     },
+}
+
+# CORS Configuration for React Frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",      # Local development
+    "http://localhost:8000",      # Local backend
+    "http://127.0.0.1:3000",
+    "https://localhost:3000",
+]
+
+# Add production frontend URLs (from environment)
+CORS_PROD_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '')
+if CORS_PROD_ORIGINS:
+    CORS_ALLOWED_ORIGINS.extend(CORS_PROD_ORIGINS.split(','))
+
+CORS_ALLOW_CREDENTIALS = True
+
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50,
 }
