@@ -25,7 +25,7 @@ class ElectricityTheftDetector:
         self.lof_model = None
         self.if_model = None
         self.scaler_fitted = False
-        self.contamination = 0.1  # Expect ~10% anomalies
+        self.contamination = 0.05  # Expect ~5% anomalies (less aggressive)
         
     def train(self, X, y=None):
         """
@@ -110,7 +110,7 @@ class ElectricityTheftDetector:
             votes.append(vote)
         
         votes = np.array(votes)
-        voting_pred = np.where(votes >= 1, -1, 1)  # Majority voting (threshold=1)
+        voting_pred = np.where(votes >= 2, -1, 1)  # Require both models to agree (threshold=2)
         confidence = np.abs(votes / 2.0)  # Confidence based on agreement
         
         return {
