@@ -128,7 +128,7 @@ In Vercel Dashboard → **Settings** → **Environment Variables**:
 
 ```
 REACT_APP_API_URL=https://electricity-theft-backend.onrender.com
-REACT_APP_API_BASE_URL=https://electricity-theft-backend.onrender.com/api
+REACT_APP_API_BASE_URL=https://electricity-theft-detection-tsr7.onrender.com/api/
 ```
 
 ### 3.4 Deploy
