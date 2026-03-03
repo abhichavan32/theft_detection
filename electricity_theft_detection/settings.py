@@ -69,20 +69,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'electricity_theft_detection.wsgi.application'
 
-# Database configuration from .env
-DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
-DB_NAME = os.getenv('DB_NAME', 'db.sqlite3')
+# Database configuration from .env or DATABASE_URL (Render)
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-DATABASES = {
-    'default': {
-        'ENGINE': DB_ENGINE,
-        'NAME': BASE_DIR / DB_NAME if DB_ENGINE == 'django.db.backends.sqlite3' else DB_NAME,
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+if DATABASE_URL:
+    # Use DATABASE_URL from Render PostgreSQL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Use individual database settings
+    DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
+    DB_NAME = os.getenv('DB_NAME', 'db.sqlite3')
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': BASE_DIR / DB_NAME if DB_ENGINE == 'django.db.backends.sqlite3' else DB_NAME,
+            'USER': os.getenv('DB_USER', ''),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
