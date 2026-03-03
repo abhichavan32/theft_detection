@@ -21,7 +21,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-electricity-theft-detectio
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # For Vercel deployment - allow all hosts
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*",
+                 "electricity-theft-detection-tsr7.onrender.com",]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    "django.middleware.common.CommonMiddleware",
 ]
 
 # Add WhiteNoise only in production (Render/Vercel) and if available
@@ -184,6 +186,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",      # Local backend
     "http://127.0.0.1:3000",
     "https://localhost:3000",
+    "https://electricity-theft-detection2-qw2jvbixt.vercel.app",
 ]
 
 # Add production frontend URLs (from environment)
