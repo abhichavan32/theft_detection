@@ -14,8 +14,6 @@ env
 .idea
 *.swp
 db.sqlite3
-staticfiles
-media
 .pytest_cache
 htmlcov
 .coverage
@@ -26,3 +24,8 @@ node_modules
 .next
 .turbo
 .vercel
+.github
+tests
+docs
+*.md
+!README.md
