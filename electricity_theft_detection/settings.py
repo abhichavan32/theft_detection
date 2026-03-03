@@ -21,8 +21,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-electricity-theft-detectio
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # For Vercel deployment - allow all hosts
-ALLOWED_HOSTS = ["*",
-                 "electricity-theft-detection-tsr7.onrender.com",]
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,14 +30,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    "corsheaders",
     'rest_framework',
     'theft_detection',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     "django.middleware.common.CommonMiddleware",
 ]
 
