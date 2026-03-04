@@ -4,10 +4,7 @@ Django settings for electricity_theft_detection project.
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
 
 try:
     import dj_database_url
@@ -30,13 +27,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "corsheaders",
     'rest_framework',
     'theft_detection',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "django.middleware.common.CommonMiddleware",
 ]
@@ -130,6 +125,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'theft_detection', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # WhiteNoise configuration - only in production if available
 if not DEBUG:
     try:
@@ -152,9 +151,8 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 
-# CORS and Security
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000').split(',')
+# Security
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 
 # Logging
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
@@ -179,21 +177,7 @@ LOGGING = {
     },
 }
 
-# CORS Configuration for React Frontend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",      # Local development
-    "http://localhost:8000",      # Local backend
-    "http://127.0.0.1:3000",
-    "https://localhost:3000",
-    "https://electricity-theft-detection2-qw2jvbixt.vercel.app",
-]
 
-# Add production frontend URLs (from environment)
-CORS_PROD_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '')
-if CORS_PROD_ORIGINS:
-    CORS_ALLOWED_ORIGINS.extend(CORS_PROD_ORIGINS.split(','))
-
-CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework configuration
 REST_FRAMEWORK = {

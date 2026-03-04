@@ -50,7 +50,7 @@
             <tbody>
                 {% for pred in predictions %}
                 <tr>
-                    <td><strong>{{ pred.electricity_data.meter_id }}</strong></td>
+                    <td><a href="{% url 'theft_detection:meter_detail' pred.electricity_data.meter_id %}" class="table-link">{{ pred.electricity_data.meter_id }}</a></td>
                     <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
                     <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
                     <td><span class="score">{{ pred.confidence|floatformat:3 }}</span></td>
@@ -63,6 +63,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
         <div class="empty-state">
             <p>No predictions found. Generate data first!</p>

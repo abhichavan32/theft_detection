@@ -32,7 +32,7 @@
         <div class="stats-grid">
             <div class="stat-box">
                 <h3>Total Predictions</h3>
-                <div class="value">{{ predictions.count }}</div>
+                <div class="value">{{ predictions|length }}</div>
             </div>
             <div class="stat-box">
                 <h3>Theft Detected</h3>
@@ -48,6 +48,7 @@
             </div>
         </div>
 
+        <div class="recent-section">
         <table>
             <thead>
                 <tr>
@@ -72,6 +73,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
 
         {% endif %}
     </div>
