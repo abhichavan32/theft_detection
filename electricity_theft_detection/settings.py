@@ -33,11 +33,18 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
+# Add WhiteNoise only in production (Render/Vercel) and if available
+if not DEBUG:
+    try:
+        import whitenoise
+        MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+    except ImportError:
+        pass
+
 MIDDLEWARE.extend([
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
