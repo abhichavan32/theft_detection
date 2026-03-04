@@ -33,16 +33,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "django.middleware.common.CommonMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
-
-# Add WhiteNoise only in production (Render/Vercel) and if available
-if not DEBUG:
-    try:
-        import whitenoise
-        MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
-    except ImportError:
-        pass
 
 MIDDLEWARE.extend([
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -121,21 +114,15 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files configuration
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'theft_detection', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# WhiteNoise configuration - only in production if available
-if not DEBUG:
-    try:
-        import whitenoise
-        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    except ImportError:
-        pass
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
