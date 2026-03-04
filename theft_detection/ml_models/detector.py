@@ -42,7 +42,7 @@ class ElectricityTheftDetector:
             n_neighbors=20,
             contamination=self.contamination,
             novelty=True,
-            n_jobs=-1
+            n_jobs=1
         )
         self.lof_model.fit(X_scaled)
         
@@ -50,7 +50,7 @@ class ElectricityTheftDetector:
         self.if_model = IsolationForest(
             contamination=self.contamination,
             random_state=42,
-            n_jobs=-1
+            n_jobs=1
         )
         self.if_model.fit(X_scaled)
         
