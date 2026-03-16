@@ -5,78 +5,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meter Details</title>
+    <title>Meter Details | Electricity Theft Detection</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>📍 Meter Detail: {{ meter_id }}</h1>
-            <p>Deep-dive consumption analysis</p>
+            <h1><i class="fa-solid fa-bolt" style="color: var(--accent-primary);"></i> Meter Details: {{ meter_id }}</h1>
+            <p>Deep-dive consumption analysis & pattern recognition</p>
         </header>
 
         <nav>
-            <a href="{% url 'theft_detection:index' %}">Dashboard</a>
-            <a href="{% url 'theft_detection:predictions_list' %}">History</a>
-            <a href="{% url 'theft_detection:predict_page' %}">Run Analysis</a>
-            <a href="/admin/">Admin</a>
+            <a href="{% url 'theft_detection:index' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% url 'theft_detection:predictions_list' %}"><i class="fa-solid fa-chart-column"></i> History</a>
+            <a href="{% url 'theft_detection:predict_page' %}"><i class="fa-solid fa-flask"></i> Run Analysis</a>
+            <a href="/admin/"><i class="fa-solid fa-gear"></i> Admin</a>
         </nav>
 
         {% if error %}
         <div class="error">
-            <strong>Error:</strong> {{ error }}
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Error:</strong> {{ error }}
         </div>
         {% else %}
 
         <div class="stats-grid">
-            <div class="stat-box">
-                <h3>Total Predictions</h3>
+            <div class="stat-box" data-animation="slideUp">
+                <h3><i class="fa-solid fa-chart-simple"></i> Total Predictions</h3>
                 <div class="value">{{ predictions|length }}</div>
             </div>
-            <div class="stat-box">
-                <h3>Theft Detected</h3>
+            <div class="stat-box theft" data-animation="slideUp">
+                <h3><i class="fa-solid fa-circle-exclamation"></i> Theft Detected</h3>
                 <div class="value theft">{{ theft_count }}</div>
             </div>
-            <div class="stat-box">
-                <h3>Normal Usage</h3>
+            <div class="stat-box normal" data-animation="slideUp">
+                <h3><i class="fa-solid fa-circle-check"></i> Normal Usage</h3>
                 <div class="value normal">{{ normal_count }}</div>
             </div>
-            <div class="stat-box">
-                <h3>Avg Confidence</h3>
-                <div class="value">{{ avg_confidence|floatformat:2 }}</div>
+            <div class="stat-box" data-animation="slideUp">
+                <h3><i class="fa-solid fa-bullseye"></i> Avg Confidence</h3>
+                <div class="value">{{ avg_confidence|floatformat:2 }}%</div>
             </div>
         </div>
 
         <div class="recent-section">
-        <table>
-            <thead>
-                <tr>
-                    <th>Daily Consumption</th>
-                    <th>Peak Hours</th>
-                    <th>Off-Peak Hours</th>
-                    <th>Voting Prediction</th>
-                    <th>Confidence</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pred in predictions %}
-                <tr>
-                    <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
-                    <td>{{ pred.electricity_data.peak_hours_consumption|floatformat:2 }} kWh</td>
-                    <td>{{ pred.electricity_data.off_peak_hours_consumption|floatformat:2 }} kWh</td>
-                    <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
-                    <td><strong>{{ pred.confidence|floatformat:3 }}</strong></td>
-                    <td>{{ pred.created_at|date:"M d, Y H:i" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <h2><i class="fa-solid fa-database"></i> Analysis Records</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Daily Consumption</th>
+                            <th>Peak Hours</th>
+                            <th>Off-Peak Hours</th>
+                            <th>Prediction Result</th>
+                            <th>Confidence Level</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
+                            <td>{{ pred.electricity_data.peak_hours_consumption|floatformat:2 }} kWh</td>
+                            <td>{{ pred.electricity_data.off_peak_hours_consumption|floatformat:2 }} kWh</td>
+                            <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
+                            <td><strong>{{ pred.confidence|floatformat:3 }}</strong></td>
+                            <td>{{ pred.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {% endif %}
+
+        <footer>
+            <p>&copy; 2026 Electricity Theft Detection System | Meter Analysis Module</p>
+        </footer>
     </div>
+
+    <script src="{% static 'js/animations.js' %}"></script>
 </body>
 
 </html>

@@ -14,6 +14,8 @@ urlpatterns = [
     path('predictions/', views.predictions_list, name='predictions_list'),
     path('meter/<str:meter_id>/', views.meter_detail, name='meter_detail'),
     path('predict/', views.predict_page, name='predict_page'),
+    path('predict/api/', views.predict_api, name='predict_api'),
+    path('retrain/', views.retrain_model, name='retrain_model'),
     
     # API endpoints
     path('api/', include(router.urls)),

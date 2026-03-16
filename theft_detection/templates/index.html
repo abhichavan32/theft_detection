@@ -4,77 +4,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Theft Detection</title>
+    <title>Electricity Theft Detection | Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>⚡ Intelligence Dashboard</h1>
-            <p>Electricity anomaly tracking & theft detection</p>
+            <h1><i class="fa-solid fa-bolt" style="color: var(--accent-primary);"></i> Intelligence Dashboard</h1>
+            <p>Real-time electricity anomaly tracking & advanced theft detection system</p>
         </header>
         
         <nav>
-            <a href="{% url 'theft_detection:index' %}">Dashboard</a>
-            <a href="{% url 'theft_detection:predictions_list' %}">History</a>
-            <a href="{% url 'theft_detection:predict_page' %}">Run Analysis</a>
-            <a href="/admin/">Admin</a>
+            <a href="{% url 'theft_detection:index' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% url 'theft_detection:predictions_list' %}"><i class="fa-solid fa-chart-column"></i> History</a>
+            <a href="{% url 'theft_detection:predict_page' %}"><i class="fa-solid fa-flask"></i> Run Analysis</a>
+            <a href="/admin/"><i class="fa-solid fa-gear"></i> Admin</a>
         </nav>
         
         {% if error %}
         <div class="error">
-            <strong>Error:</strong> {{ error }}
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Error:</strong> {{ error }}
         </div>
         {% endif %}
         
         <div class="stats-grid">
-            <div class="stat-card total">
-                <h3>Total Records</h3>
+            <div class="stat-card total" data-animation="slideUp">
+                <h3>Total Records Analyzed</h3>
                 <div class="value">{{ total_records }}</div>
             </div>
-            <div class="stat-card theft">
-                <h3>Theft Detected</h3>
+            <div class="stat-card theft" data-animation="slideUp">
+                <h3><i class="fa-solid fa-circle-exclamation"></i> Theft Detected</h3>
                 <div class="value">{{ theft_records }}</div>
             </div>
-            <div class="stat-card normal">
-                <h3>Normal Usage</h3>
+            <div class="stat-card normal" data-animation="slideUp">
+                <h3><i class="fa-solid fa-circle-check"></i> Normal Usage</h3>
                 <div class="value">{{ normal_records }}</div>
             </div>
         </div>
         
         {% if recent_predictions %}
         <div class="recent-section">
-            <h2>Recent Predictions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Meter ID</th>
-                        <th>Daily Consumption (kWh)</th>
-                        <th>Prediction</th>
-                        <th>Confidence</th>
-                        <th>LOF</th>
-                        <th>Isolation Forest</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pred in recent_predictions %}
-                    <tr>
-                        <td><a href="{% url 'theft_detection:meter_detail' pred.electricity_data.meter_id %}" class="table-link">{{ pred.electricity_data.meter_id }}</a></td>
-                        <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }}</td>
-                        <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
-                        <td><span class="confidence">{{ pred.confidence|floatformat:2 }}</span></td>
-                        <td>{{ pred.lof_prediction|upper }}</td>
-                        <td>{{ pred.if_prediction|upper }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h2><i class="fa-solid fa-arrow-trend-up"></i> Recent Predictions</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Meter ID</th>
+                            <th>Daily Consumption (kWh)</th>
+                            <th>Prediction</th>
+                            <th>Confidence Score</th>
+                            <th>LOF Algorithm</th>
+                            <th>Isolation Forest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in recent_predictions %}
+                        <tr>
+                            <td><a href="{% url 'theft_detection:meter_detail' pred.electricity_data.meter_id %}" class="table-link">{{ pred.electricity_data.meter_id }}</a></td>
+                            <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }}</td>
+                            <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
+                            <td><span class="confidence">{{ pred.confidence|floatformat:2 }}%</span></td>
+                            <td>{{ pred.lof_prediction|upper }}</td>
+                            <td>{{ pred.if_prediction|upper }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% endif %}
         
         <footer>
-            <p>&copy; 2026 Electricity Theft Detection System | Advanced ML-based Detection</p>
+            <p>&copy; 2026 Electricity Theft Detection System | Powered by Advanced Machine Learning</p>
         </footer>
     </div>
+
+    <script src="{% static 'js/animations.js' %}"></script>
 </body>
 </html>

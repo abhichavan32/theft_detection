@@ -5,71 +5,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Predictions</title>
+    <title>Analysis History | Electricity Theft Detection</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>📊 Analysis History</h1>
-            <p>View all past anomaly detections</p>
+            <h1><i class="fa-solid fa-chart-column" style="color: var(--accent-primary);"></i> Analysis History</h1>
+            <p>View all past anomaly detections & predictions</p>
         </header>
 
         <nav>
-            <a href="{% url 'theft_detection:index' %}">Dashboard</a>
-            <a href="{% url 'theft_detection:predictions_list' %}">History</a>
-            <a href="{% url 'theft_detection:predict_page' %}">Run Analysis</a>
-            <a href="/admin/">Admin</a>
+            <a href="{% url 'theft_detection:index' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% url 'theft_detection:predictions_list' %}"><i class="fa-solid fa-chart-column"></i> History</a>
+            <a href="{% url 'theft_detection:predict_page' %}"><i class="fa-solid fa-flask"></i> Run Analysis</a>
+            <a href="/admin/"><i class="fa-solid fa-gear"></i> Admin</a>
         </nav>
 
-        <div class="filters">
-            <label>Filter by Status:</label>
-            <select onchange="location = '?theft=' + this.value;">
-                <option value="">All Predictions</option>
-                <option value="theft" {% if theft_filter == "theft" %}selected{% endif %}>Theft Only</option>
-                <option value="normal" {% if theft_filter == "normal" %}selected{% endif %}>Normal Only</option>
-            </select>
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="filters" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label><i class="fa-solid fa-filter"></i> Filter:</label>
+                    <select onchange="const url = new URL(window.location); url.searchParams.set('theft', this.value); window.location = url.toString();">
+                        <option value="">All Predictions</option>
+                        <option value="theft" {% if theft_filter == "theft" %}selected{% endif %}>Theft Only</option>
+                        <option value="normal" {% if theft_filter == "normal" %}selected{% endif %}>Normal Only</option>
+                    </select>
+                </div>
+                
+                <form action="{% url 'theft_detection:predictions_list' %}" method="get" style="margin: 0; display: flex; align-items: center;">
+                    {% if theft_filter %}
+                    <input type="hidden" name="theft" value="{{ theft_filter }}">
+                    {% endif %}
+                    <div style="display: flex;">
+                        <input type="text" name="search" placeholder="Search meter ID..." value="{{ search_query|default:'' }}" style="padding: 0.625rem 0.75rem; border: 1px solid var(--border-base); border-radius: var(--radius-sm) 0 0 var(--radius-sm); border-right: none; outline: none; font-size: 0.95rem; font-family: inherit;">
+                        <button type="submit" style="margin-top: 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 0.625rem 1rem; width: auto;"><i class="fa-solid fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+            
+            <form action="{% url 'theft_detection:retrain_model' %}" method="post" id="retrainForm" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" style="margin-top: 0; background-color: var(--success-text); padding: 0.625rem 1rem; width: auto;"><i class="fa-solid fa-brain" style="margin-right: 0.5rem;"></i> Retrain Model</button>
+            </form>
         </div>
 
         {% if predictions %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Meter ID</th>
-                    <th>Daily Consumption</th>
-                    <th>Voting Prediction</th>
-                    <th>Confidence</th>
-                    <th>LOF Prediction</th>
-                    <th>LOF Score</th>
-                    <th>IF Prediction</th>
-                    <th>IF Score</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pred in predictions %}
-                <tr>
-                    <td><a href="{% url 'theft_detection:meter_detail' pred.electricity_data.meter_id %}" class="table-link">{{ pred.electricity_data.meter_id }}</a></td>
-                    <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
-                    <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
-                    <td><span class="score">{{ pred.confidence|floatformat:3 }}</span></td>
-                    <td>{{ pred.lof_prediction|upper }}</td>
-                    <td><span class="score">{{ pred.lof_score|floatformat:4 }}</span></td>
-                    <td>{{ pred.if_prediction|upper }}</td>
-                    <td><span class="score">{{ pred.if_score|floatformat:4 }}</span></td>
-                    <td>{{ pred.created_at|date:"M d, Y H:i" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="recent-section">
+            <h2><i class="fa-solid fa-folder-open"></i> Complete Prediction Log</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Meter ID</th>
+                            <th>Daily Consumption</th>
+                            <th>Voting Prediction</th>
+                            <th>Confidence</th>
+                            <th>LOF Prediction</th>
+                            <th>LOF Score</th>
+                            <th>IF Prediction</th>
+                            <th>IF Score</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td><a href="{% url 'theft_detection:meter_detail' pred.electricity_data.meter_id %}" class="table-link">{{ pred.electricity_data.meter_id }}</a></td>
+                            <td>{{ pred.electricity_data.daily_consumption|floatformat:2 }} kWh</td>
+                            <td><span class="badge {{ pred.voting_prediction }}">{{ pred.voting_prediction|upper }}</span></td>
+                            <td><span class="score">{{ pred.confidence|floatformat:3 }}</span></td>
+                            <td>{{ pred.lof_prediction|upper }}</td>
+                            <td><span class="score">{{ pred.lof_score|floatformat:4 }}</span></td>
+                            <td>{{ pred.if_prediction|upper }}</td>
+                            <td><span class="score">{{ pred.if_score|floatformat:4 }}</span></td>
+                            <td>{{ pred.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% else %}
         <div class="empty-state">
-            <p>No predictions found. Generate data first!</p>
+            <p><i class="fa-solid fa-box-open" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i> No predictions found. Generate data first!</p>
         </div>
         {% endif %}
+
+        <footer>
+            <p>&copy; 2026 Electricity Theft Detection System | Predictions History Module</p>
+        </footer>
     </div>
+
+    <script src="{% static 'js/animations.js' %}"></script>
 </body>
 
 </html>
